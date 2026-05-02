@@ -1,14 +1,12 @@
 import os
-import random
 import asyncio
 from aiogram import Bot, Dispatcher
 from aiogram.types import InlineQuery, InlineQueryResultArticle, InputTextMessageContent
 
-# Токен из переменных окружения
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 
 if not BOT_TOKEN:
-    raise ValueError("❌ BOT_TOKEN не найден в переменных окружения")
+    raise ValueError("❌ BOT_TOKEN не найден")
 
 bot = Bot(token=BOT_TOKEN)
 dp = Dispatcher()
@@ -18,29 +16,31 @@ dp = Dispatcher()
 async def inline_handler(query: InlineQuery):
     text = query.query.strip()
 
-    # если ничего не написано — не отвечаем
     if not text:
         return
 
-    # генерируем ответ
-    answer = random.choice(["Yes", "No"])
+    answers = ["Ес", "Ноу"]
 
-    result = InlineQueryResultArticle(
-        id="1",
-        title=f"Ответ: {answer}",
-        description=text,
-        input_message_content=InputTextMessageContent(
-            message_text=f"{text}\n\n<b>{answer}</b>",
-            parse_mode="HTML"
+    results = []
+
+    for i, ans in enumerate(answers):
+        results.append(
+            InlineQueryResultArticle(
+                id=str(i),
+                title=ans,
+                description=text,
+                input_message_content=InputTextMessageContent(
+                    message_text=f"{text}\n\n<b>{ans}</b>",
+                    parse_mode="HTML"
+                )
+            )
         )
-    )
 
-    # отправляем результат
-    await query.answer([result], cache_time=1)
+    await query.answer(results, cache_time=5)
 
 
 async def main():
-    print("✅ Inline бот запущен")
+    print("✅ Бот запущен")
     await dp.start_polling(bot)
 
 
